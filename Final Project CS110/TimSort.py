@@ -1,3 +1,8 @@
+# Took inspiration from Tim Peter's original explanation,
+# https://github.com/python/cpython/blob/master/Objects/listsort.txt
+# and the PyPy's implementation:
+# https://bitbucket.org/pypy/pypy/src/default/rpython/rlib/listsort.py?fileviewer=file-view-default
+
 import random
 import bisect
 
@@ -93,9 +98,6 @@ def bin_sort(lst, s, e, extend):
 
         if start > end:
             pos = start
-
-        if pos > e + i:
-            pos -= 1
 
         # 'Push' the elements to the right by 1 element
         # Copy the value back the right position.
@@ -530,70 +532,11 @@ def timsort(lst):
         merge_collapse(lst, stack)
 
         # Update starting position to find the next run
-        # If run[1] == end of the lst, exit the loop
+        # If run[1] == end of the lst, s > e, loop exits
         s = run[1] + 1
 
     # Some runs might be left in the stack, complete the merging.
     merge_force_collapse(lst, stack)
 
     # Return the lst, ta-da.
-    return min_run
-
-
-# Different test cases
-lst1 = []
-lst2 = [1]
-lst3 = [1, 2]
-lst4 = [i for i in range(-1000, 1000)]
-lst5 = [i for i in range(1000, -1000, -1)]
-lst6 = [random.randint(-10000, 10000) for i in range(1000)]
-lst7 = [-1,2,-3,4,5]*1000
-lst8 = [(i + 0.2) for i in range(10000)]
-lst9 = [i for i in range(1000, 2)]
-lst10 = [0 for i in range(1000)]
-lst11 = [random.random() for i in range(1000)]
-lst12 = [i for i in range(9999, -1, -2)]
-test_cases = [lst1, lst2, lst3, lst4, lst5, lst6, lst7, lst8, lst9, lst10, lst11, lst12]
-
-
-def test_sort():
-    """Test accuracy of algorithm"""
-    for lst in test_cases:
-        # Make a copy of the case
-        sortable = lst.copy()
-
-        # Make another copy of the case
-        sortable_copy = lst.copy()
-        sorted_copy = timsort(sortable_copy)
-
-        assert sorted_copy is sortable_copy
-        assert sorted_copy == sorted(sortable)
-
-    return "No error"
-
-
-def test_sort_alt(lst):
-    # Create a copy of the list
-    copy = lst.copy()
-    timsort(lst)
-    # Compare each element to the next element
-    for i in range(len(lst) - 1):
-        assert lst[i] <= lst[i + 1]
-        i += 1
-
-    # Assure that the lengths are the same
-    assert len(copy) == len(lst)
-
-    # Sort the copy
-    copy.sort()
-
-    # Every element in copy is in lst
-    for i in range(len(lst)):
-        assert copy[i] == lst[i]
-
-    # Result of the sorting algorithm is the same as the default sort
-    assert lst is copy
-
-lst = [random.randint(-10000, 10000) for i in range(500)]
-print(timsort(lst))
-print(lst)
+    return lst

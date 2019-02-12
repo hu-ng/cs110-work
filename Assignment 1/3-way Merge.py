@@ -1,54 +1,33 @@
-#Hung
-import math
+def three_way_merge(alist, l , r):
+    # Solve for edge case: a list of 2 cannot be further divided by 3.
+    if r - l > 1:
+        mid1 = l + (r - l)//3
+        mid2 = l +2*(r - l)//3
 
-def mergesort (A, start, end):
-    mid1 = (end + start) // 3
-    mid2 = (end + mid1) // 2
-    print(mid1, mid2)
-    if end - start >= 1 and start <= mid1:
-        mergesort(A, start, mid1)
-        #print(start, mid1)
-        mergesort(A, mid1 + 1, mid2)
-        print(mid1 + 1, mid2)
-        mergesort(A, mid2 + 1, end)
-        #print(mid2 + 1, end)
-        #print(start, mid1, mid2, end)
-        merge(A, start, mid1, mid2, end)
+        three_way_merge(alist, l, mid1)
+        three_way_merge(alist, mid1, mid2)
+        three_way_merge(alist, mid2, r)
 
-    return A
+        merge_three(alist, l, mid1, mid2, r)
+    return alist
 
-def merge(A, start, mid1, mid2, end):
-    n1 = mid1 - start + 1
-    n2 = mid2 - mid1
-    n3 = end - mid2
-    L = [None]*(n1 + 1)
-    M = [None]*(n2 + 1)
-    R = [None]*(n3 + 1)
-    for i in range(n1):
-        L[i] = A[start + i]
-    for j in range(n2):
-        M[j] = A[mid1 + 1 + j]
-    for y in range(n3):
-        R[y] = A[mid2 + 1 + y]
-    print(L, M, R)
-    L[n1] = math.inf
-    M[n2] = math.inf
-    R[n3] = math.inf
-    i = 0
-    j = 0
-    y = 0
-    for k in range(start, end + 1):
-        if L[i] <= M[j] and L[i] <= R[y]:
-            A[k] = L[i]
-            i += 1
-        elif M[j] <= L[i] and M[j] <= R[y]:
-            A[k] = M[j]
-            j += 1
+def merge_three(alist, l, mid1, mid2, r):
+    left = alist[l:mid1] + [float('inf')]
+    middle = alist[mid1:mid2] + [float('inf')]
+    right = alist[mid2:r] + [float('inf')]
+    left_idx = 0
+    mid_idx = 0
+    right_idx = 0
+
+    for pos in range(l, r):
+        min = None
+        if left[left_idx] <= middle[mid_idx] and left[left_idx] <= right[right_idx]:
+            min = left[left_idx]
+            left_idx += 1
+        elif right[right_idx] <= left[left_idx] and right[right_idx] <= middle[mid_idx]:
+            min = right[right_idx]
+            right_idx += 1
         else:
-            A[k] = R[y]
-            y += 1
-
-
-# list = [9,8,7,6,5,4,3,2,1]
-L = [9,8,7,6,5,4,3,2,1]
-print(mergesort(L, 0, len(L) - 1))
+            min = middle[mid_idx]
+            mid_idx += 1
+        alist[pos] = min
